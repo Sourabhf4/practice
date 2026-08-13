@@ -1,302 +1,512 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome CDECB4 Students!</title>
-  <!-- Google Fonts for Modern Typography -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <style>
-    /* -------------------------------------------------------------
-       1. Global Styles & CSS Variables
-    ------------------------------------------------------------- */
-    :root {
-      --bg-dark: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.5);
-      --card-border: rgba(255, 255, 255, 0.1);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent-purple: #8b5cf6;
-      --accent-cyan: #06b6d4;
-      --accent-pink: #ec4899;
-      --glow-purple: rgba(139, 92, 246, 0.35);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    <title>Army Public School</title>
 
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      overflow-x: hidden;
-      position: relative;
-    }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-    /* -------------------------------------------------------------
-       2. Glowing Background Orbs
-    ------------------------------------------------------------- */
-    .bg-glow-1, .bg-glow-2 {
-      position: absolute;
-      width: 450px;
-      height: 450px;
-      border-radius: 50%;
-      filter: blur(120px);
-      z-index: 0;
-      pointer-events: none;
-    }
+        body {
+            line-height: 1.6;
+            color: #333;
+        }
 
-    .bg-glow-1 {
-      top: -100px;
-      left: -100px;
-      background: var(--accent-purple);
-      opacity: 0.4;
-    }
+        /* Header */
+        header {
+            background: #123524;
+            color: white;
+            padding: 15px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
 
-    .bg-glow-2 {
-      bottom: -100px;
-      right: -100px;
-      background: var(--accent-cyan);
-      opacity: 0.3;
-    }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-    /* -------------------------------------------------------------
-       3. Main Layout Container
-    ------------------------------------------------------------- */
-    .container {
-      width: 90%;
-      max-width: 1100px;
-      margin: 60px auto;
-      z-index: 1;
-      text-align: center;
-    }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #f4c542;
+            color: #123524;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
 
-    /* -------------------------------------------------------------
-       4. Header Section
-    ------------------------------------------------------------- */
-    .badge {
-      display: inline-block;
-      padding: 6px 16px;
-      background: rgba(139, 92, 246, 0.15);
-      border: 1px solid var(--accent-purple);
-      border-radius: 50px;
-      color: var(--accent-purple);
-      font-weight: 600;
-      font-size: 0.85rem;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-    }
+        .logo h2 {
+            font-size: 22px;
+        }
 
-    h1 {
-      font-family: 'Outfit', sans-serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #ffffff 30%, var(--accent-cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
+        .logo p {
+            font-size: 12px;
+            color: #ddd;
+        }
 
-    p.subtitle {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 50px auto;
-      line-height: 1.6;
-    }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: bold;
+        }
 
-    /* -------------------------------------------------------------
-       5. Student Grid Layout
-    ------------------------------------------------------------- */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
-    }
+        nav a:hover {
+            color: #f4c542;
+        }
 
-    /* Glassmorphism Card Style */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 24px 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
+        /* Hero */
+        .hero {
+            min-height: 600px;
+            background:
+                linear-gradient(rgba(18, 53, 36, 0.75), rgba(18, 53, 36, 0.75)),
+                url("https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1600&q=80");
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 30px;
+        }
 
-    /* Subtle gradient bar on top of cards */
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
+        .hero-content h1 {
+            font-size: 52px;
+            margin-bottom: 15px;
+        }
 
-    .card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 15px 30px var(--glow-purple);
-    }
+        .hero-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
 
-    .card:hover::before {
-      opacity: 1;
-    }
+        .btn {
+            display: inline-block;
+            padding: 13px 28px;
+            background: #f4c542;
+            color: #123524;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
 
-    /* Avatar Icon */
-    .avatar {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--accent-cyan);
-      margin-bottom: 12px;
-    }
+        .btn:hover {
+            background: white;
+        }
 
-    .name {
-      font-family: 'Outfit', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 4px;
-    }
+        /* Common Sections */
+        section {
+            padding: 70px 7%;
+        }
 
-    .role {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-    }
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-    /* -------------------------------------------------------------
-       6. Footer Section
-    ------------------------------------------------------------- */
-    footer {
-      margin-top: auto;
-      padding: 20px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      border-top: 1px solid var(--card-border);
-      width: 100%;
-      text-align: center;
-    }
-  </style>
+        .section-title h2 {
+            color: #123524;
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .section-title p {
+            color: #666;
+        }
+
+        /* About */
+        .about {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .about-text h2 {
+            color: #123524;
+            margin-bottom: 15px;
+            font-size: 32px;
+        }
+
+        .about-text p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        /* Academics */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            padding: 30px;
+            text-align: center;
+            background: #f7f7f7;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: #123524;
+            margin-bottom: 10px;
+        }
+
+        /* Facilities */
+        .facilities {
+            background: #f5f7f5;
+        }
+
+        /* Announcements */
+        .announcement-box {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .announcement {
+            padding: 18px 20px;
+            border-left: 5px solid #f4c542;
+            background: #f8f8f8;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .announcement strong {
+            color: #123524;
+        }
+
+        /* Contact */
+        .contact {
+            background: #123524;
+            color: white;
+        }
+
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .contact h2 {
+            margin-bottom: 20px;
+        }
+
+        .contact-info p {
+            margin-bottom: 12px;
+        }
+
+        form input,
+        form textarea {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        form textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        form button {
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            background: #0b2418;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav a {
+                margin: 0 7px;
+                font-size: 14px;
+            }
+
+            .hero-content h1 {
+                font-size: 38px;
+            }
+
+            .about,
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <!-- Background Glows -->
-  <div class="bg-glow-1"></div>
-  <div class="bg-glow-2"></div>
-
-  <!-- Main Container -->
-  <main class="container">
-    
     <!-- Header -->
-    <div class="badge">Class of CDECB4</div>
-    <h1>Welcome Aboard, Trailblazers!</h1>
-    <p class="subtitle">
-      Wishing a warm welcome to all students joining the CDECB4 cohort. Great journeys begin here!
-    </p>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">APS</div>
+            <div>
+                <h2>Army Public School</h2>
+                <p>Knowledge • Discipline • Excellence</p>
+            </div>
+        </div>
 
-    <!-- Student Cards Grid -->
-    <div class="grid">
-      
-      <div class="card">
-        <div class="avatar">J</div>
-        <div class="name">Jay</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#about">About</a>
+            <a href="#academics">Academics</a>
+            <a href="#facilities">Facilities</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
 
-      <div class="card">
-        <div class="avatar">M</div>
-        <div class="name">Mitali</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+    <!-- Hero -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Army Public School</h1>
+            <p>Building Future Leaders Through Education and Discipline</p>
+            <a href="#about" class="btn">Explore Our School</a>
+        </div>
+    </section>
 
-      <div class="card">
-        <div class="avatar">V</div>
-        <div class="name">Vyanktesh</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+    <!-- About -->
+    <section id="about">
+        <div class="section-title">
+            <h2>About Our School</h2>
+            <p>Education that inspires excellence</p>
+        </div>
 
-      <div class="card">
-        <div class="avatar">O</div>
-        <div class="name">Om</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+        <div class="about">
+            <img src="https://images.unsplash.com/photo-1564981797816-1043664bf78d?auto=format&fit=crop&w=900&q=80"
+                 alt="Army Public School">
 
-      <div class="card">
-        <div class="avatar">P</div>
-        <div class="name">Prachi</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+            <div class="about-text">
+                <h2>Welcome to Army Public School</h2>
 
-      <div class="card">
-        <div class="avatar">S</div>
-        <div class="name">Sujata</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+                <p>
+                    Army Public School is committed to providing quality education
+                    and developing responsible, confident and disciplined students.
+                </p>
 
-      <div class="card">
-        <div class="avatar">N</div>
-        <div class="name">Nilesh</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+                <p>
+                    Our school provides a balanced environment where students can
+                    grow academically, physically and socially.
+                </p>
 
-      <div class="card">
-        <div class="avatar">S</div>
-        <div class="name">Sahil</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+                <p>
+                    We believe that education is not only about academic success
+                    but also about developing strong values and leadership qualities.
+                </p>
 
-      <div class="card">
-        <div class="avatar">A</div>
-        <div class="name">Ankush</div>
-        <div class="role">CDECB4 Student</div>
-      </div>
+                <a href="#contact" class="btn">Contact Us</a>
+            </div>
+        </div>
+    </section>
 
-      <div class="card">
-        <div class="avatar">+</div>
-        <div class="name">& All Cohort</div>
-        <div class="role">CDECB4 Members</div>
-      </div>
+    <!-- Academics -->
+    <section id="academics">
+        <div class="section-title">
+            <h2>Academics</h2>
+            <p>Strong foundation for a successful future</p>
+        </div>
 
-    </div>
+        <div class="cards">
 
-  </main>
+            <div class="card">
+                <div class="card-icon">📚</div>
+                <h3>Primary Education</h3>
+                <p>
+                    Developing strong fundamentals through creative
+                    and interactive learning.
+                </p>
+            </div>
 
-  <footer>
-    &copy; CDECB4 Community • Built with passion
-  </footer>
+            <div class="card">
+                <div class="card-icon">🎓</div>
+                <h3>Secondary Education</h3>
+                <p>
+                    Preparing students with knowledge, skills and
+                    confidence for higher education.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🔬</div>
+                <h3>Science & Technology</h3>
+                <p>
+                    Encouraging innovation, experimentation and
+                    technological awareness.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Facilities -->
+    <section class="facilities" id="facilities">
+
+        <div class="section-title">
+            <h2>Our Facilities</h2>
+            <p>Creating an environment for complete development</p>
+        </div>
+
+        <div class="cards">
+
+            <div class="card">
+                <div class="card-icon">🏫</div>
+                <h3>Smart Classrooms</h3>
+                <p>Modern classrooms equipped with digital learning tools.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">📖</div>
+                <h3>Library</h3>
+                <p>A rich collection of books and learning resources.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">⚽</div>
+                <h3>Sports Ground</h3>
+                <p>Facilities for sports and physical development.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">💻</div>
+                <h3>Computer Lab</h3>
+                <p>Modern computer facilities for technology education.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🧪</div>
+                <h3>Science Labs</h3>
+                <p>Practical learning through well-equipped laboratories.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-icon">🚌</div>
+                <h3>Transport</h3>
+                <p>Safe and convenient transportation facilities.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Announcements -->
+    <section id="announcements">
+
+        <div class="section-title">
+            <h2>Latest Announcements</h2>
+            <p>Stay updated with school activities</p>
+        </div>
+
+        <div class="announcement-box">
+
+            <div class="announcement">
+                <strong>Admission Open:</strong>
+                Admissions are now open for the upcoming academic session.
+            </div>
+
+            <div class="announcement">
+                <strong>Annual Sports Day:</strong>
+                Annual Sports Day will be conducted soon. Students are requested
+                to participate actively.
+            </div>
+
+            <div class="announcement">
+                <strong>Parent-Teacher Meeting:</strong>
+                The next Parent-Teacher Meeting will be held on Saturday.
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+
+        <div class="section-title">
+            <h2 style="color:white;">Contact Us</h2>
+            <p style="color:#ddd;">We would love to hear from you</p>
+        </div>
+
+        <div class="contact-container">
+
+            <div class="contact-info">
+                <h2>Army Public School</h2>
+
+                <p>📍 Army Cantonment Area, India</p>
+                <p>📞 +91 98765 43210</p>
+                <p>✉️ info@armyschool.edu.in</p>
+                <p>🕐 Monday - Saturday: 8:00 AM - 3:00 PM</p>
+            </div>
+
+            <form>
+                <input type="text" placeholder="Your Name" required>
+
+                <input type="email" placeholder="Your Email" required>
+
+                <input type="text" placeholder="Subject">
+
+                <textarea placeholder="Your Message"></textarea>
+
+                <button type="submit" class="btn">Send Message</button>
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            &copy; 2026 Army Public School. All Rights Reserved.
+        </p>
+    </footer>
 
 </body>
 </html>

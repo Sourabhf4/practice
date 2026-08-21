@@ -21,7 +21,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 sh '''
-                    docker run -d --name frontendtest -p 80:80 frontend:latest
+                    docker run -d --name frontendtest -P frontend:latest
                 '''
             }
         }

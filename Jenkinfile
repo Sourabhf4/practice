@@ -13,7 +13,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('frontend') {
-                    sh 'docker build -t frontend:latest .'
+                    sh 'docker build -t frontendd:latest .'
                 }
             }
         }
@@ -21,7 +21,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 sh '''
-                    docker run -d --name frontend -p 80:80 frontend:latest
+                    docker run -d --name frontendhkdbfcnwihgefvjud -P frontendd:latest
                 '''
             }
         }

@@ -3,17 +3,33 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Clone') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/Sourabhf4/practice.git'
+                    url: 'https://github.com/Sourabhf4/student-app-k8s.git'
             }
         }
 
-        stage('Verify Code') {
+        stage('Build Docker Image') {
             steps {
-                sh 'ls -la'
+                dir('frontend') {
+                    sh 'docker build -t frontend:latest .'
+                }
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                    docker run -d --name frontend -p 80:80 frontend:latest
+                '''
             }
         }
     }
 }
+
+
+
+
+
+

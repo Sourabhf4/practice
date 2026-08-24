@@ -1,125 +1,319 @@
-Here is the complete guide formatted in raw Markdown. You can easily copy and paste it into a README.md file using the Copy button in the top corner of the code block below:
+# 🚀 Jenkins + Terraform + AWS CI/CD Pipeline — Complete Guide
 
-Markdown
-# AWS Infrastructure Automation with Jenkins & Terraform (IAM Role Auth) 🚀
+## 📌 Project Overview
 
-A complete step-by-step hands-on guide to building an automated CI/CD infrastructure pipeline. This guide demonstrates how to configure a Jenkins EC2 instance using **IAM Roles** (eliminating static access keys), define infrastructure with **Terraform**, version-control via **GitHub**, and execute end-to-end automated deployments via a **Jenkins Pipeline**.
+This guide explains how to build a basic CI/CD pipeline using:
 
----
+- 🔧 Jenkins
+- 🏗️ Terraform
+- ☁️ AWS
+- 🐙 GitHub
+- 🐧 Ubuntu EC2
 
-## 🏗️ Architecture Overview
+The goal is to automatically deploy Terraform infrastructure through Jenkins.
+
+### Final Architecture
 
 ```text
-               +----------------------------------+
-               |            AWS Cloud             |
-               |                                  |
-               |   +--------------------------+   |
-               |   |   IAM Role               |   |
-               |   |   (AdministratorAccess)  |   |
-               |   +------------+-------------+   |
-               |                | (Attached)      |
-               |                v                 |
-+----------+   |   +--------------------------+   |   +-----------------+
-|  GitHub  | --> |  Jenkins EC2 Instance    | --> |  AWS Resources  |
-|  Repo    |   |   |  - Git                   |   |   (e.g., S3     |
-+----------+   |   |  - Terraform CLI         |   |    Bucket)      |
-               |   +--------------------------+   |   +-----------------+
-               +----------------------------------+
-🔁 Pipeline Execution Flow
-Plaintext
-GitHub Push ──► Jenkins Checkout ──► Terraform Init ──► Terraform Validate ──► Terraform Plan ──► Terraform Apply ──► AWS Resource Provisioned
-📋 Prerequisites
-Before starting, ensure you have:
+                    ☁️ AWS
+                      │
+                      │ IAM Role
+                      ▼
+🐙 GitHub ───────► 🔧 Jenkins EC2
+                      │
+                      │ Jenkinsfile
+                      ▼
+                  🏗️ Terraform
+                      │
+                      ▼
+                 ☁️ AWS Resources
+Pipeline Flow
+Developer
+    │
+    │ git push
+    ▼
+GitHub
+    │
+    │ Jenkins checkout
+    ▼
+Jenkins
+    │
+    ├── Checkout
+    ├── Terraform Init
+    ├── Terraform Validate
+    ├── Terraform Plan
+    └── Terraform Apply
+             │
+             ▼
+          AWS
+🧰 Prerequisites
 
-An active AWS Account.
+Before starting, make sure you have:
 
-An EC2 Instance running Ubuntu with Jenkins and Terraform pre-installed.
+✅ AWS Account
+✅ Ubuntu EC2 instance
+✅ Jenkins installed
+✅ Terraform installed
+✅ Git installed
+✅ GitHub account
+✅ Basic Linux knowledge
 
-Git installed locally and configured.
+Example environment:
 
-A GitHub Account for remote repository hosting.
+Operating System : Ubuntu
+Cloud            : AWS
+Region           : ap-south-1
+CI/CD Tool       : Jenkins
+Infrastructure   : Terraform
+Source Control   : GitHub
+Terraform Demo   : AWS S3 Bucket
+1️⃣ Connect to the Jenkins EC2 Server
 
-🚀 Step-by-Step Implementation
-Step 1: Create an IAM Role for Jenkins EC2 🛡️
-Instead of hardcoding AWS credentials inside Jenkins or Terraform, we use an IAM Role attached directly to the EC2 instance for secure, keyless authentication.
+Connect to your Ubuntu EC2 instance:
 
-Log in to the AWS Management Console.
+ssh ubuntu@<JENKINS-EC2-IP>
 
-Navigate to IAM ➔ Roles ➔ click Create role.
+Example:
 
-Under Select trusted entity:
+ssh ubuntu@13.201.10.20
+2️⃣ Verify Jenkins Installation
 
-Trusted entity type: Select AWS service.
+Check Jenkins status:
 
-Use case: Select EC2.
+sudo systemctl status jenkins
 
-Click Next.
+You should see:
 
-Under Add permissions:
+Active: active (running)
 
-Search for and select AdministratorAccess.
+If Jenkins is not running:
 
-Note: In production environments, follow the principle of least privilege. AdministratorAccess is used here for sandbox/learning purposes.
+sudo systemctl start jenkins
 
-Click Next.
+Enable Jenkins to start automatically after reboot:
 
-Set Role name:
+sudo systemctl enable jenkins
 
-Enter JenkinsTerraformRole.
+Check Jenkins version:
 
-Click Create role.
+jenkins --version
 
-Step 2: Attach the IAM Role to the Jenkins EC2 Instance 🔗
-Navigate to EC2 ➔ Instances in the AWS Console.
+Jenkins should be accessible from:
 
-Select your running Jenkins EC2 instance.
+http://<JENKINS-IP>:8080
 
-Click Actions ➔ Security ➔ Modify IAM role.
+Example:
 
-From the dropdown list, select JenkinsTerraformRole.
+http://13.201.10.20:8080
+3️⃣ Verify Terraform Installation
 
-Click Update IAM role.
+Check Terraform:
 
-Step 3: Verify AWS Credentials on the Jenkins Server 🧪
-SSH into your Jenkins EC2 instance:
+terraform version
 
-Bash
-ssh ubuntu@YOUR_EC2_PUBLIC_IP
-Test AWS CLI connectivity as the default user (ubuntu):
+Example:
 
-Bash
-aws sts get-caller-identity
-Crucial Step: Test AWS CLI connectivity as the jenkins system user to ensure Jenkins has access to the IAM Role credentials:
+Terraform v1.x.x
 
-Bash
-sudo -u jenkins aws sts get-caller-identity
-Expected Output:
+Now check whether the Jenkins user can access Terraform:
 
-JSON
-{
-    "UserId": "AROAXXXXXXXXXXXXXXXXX:i-0123456789abcdef0",
-    "Account": "123456789012",
-    "Arn": "arn:aws:sts::123456789012:assumed-role/JenkinsTerraformRole/i-0123456789abcdef0"
-}
-If both commands return your Account ID and Role ARN, the security configuration is complete!
+sudo -u jenkins terraform version
 
-Step 4: Set Up the Terraform Workspace 📁
-On your Jenkins server, create a dedicated project directory:
+This is important because Jenkins executes pipeline commands using the Jenkins user.
 
-Bash
-mkdir -p ~/terraform-jenkins && cd ~/terraform-jenkins
-Create the provider configuration file (provider.tf):
+If this command returns the Terraform version, Jenkins can use Terraform.
 
-Bash
-nano provider.tf
-Add the following code:
+4️⃣ Install and Verify Git
 
+Check Git:
+
+git --version
+
+If Git is not installed:
+
+sudo apt update
+sudo apt install -y git
+
+Verify:
+
+git --version
+
+Example:
+
+git version 2.x.x
+5️⃣ Install AWS CLI
+
+Check AWS CLI:
+
+aws --version
+
+If it is not installed:
+
+sudo apt update
+sudo apt install -y awscli
+
+Verify:
+
+aws --version
+6️⃣ Configure AWS IAM Role for Jenkins 🔐
+Why do we need an IAM Role?
+
+Terraform needs AWS permissions to create and manage infrastructure.
+
+Instead of storing AWS Access Keys inside Jenkins, we will attach an IAM Role to the Jenkins EC2 instance.
+
+The architecture is:
+
+Jenkins EC2
+     │
+     ▼
+IAM Role
+     │
+     ▼
+AWS Permissions
+     │
+     ▼
 Terraform
+     │
+     ▼
+AWS Resources
+
+This is the recommended approach when Jenkins is running on an AWS EC2 instance.
+
+7️⃣ Create the IAM Role
+
+Open:
+
+AWS Console
+    ↓
+IAM
+    ↓
+Roles
+    ↓
+Create role
+
+Select:
+
+Trusted entity type:
+AWS service
+
+Then:
+
+Use case:
+EC2
+
+Click:
+
+Next
+8️⃣ Add Permissions to the IAM Role
+
+For a basic learning environment, you can temporarily select:
+
+AdministratorAccess
+
+⚠️ Important:
+
+Do not use AdministratorAccess in production.
+
+For production, create a least-privilege IAM policy that allows only the AWS resources Terraform needs.
+
+Click:
+
+Next
+
+Then:
+
+Next
+9️⃣ Name the IAM Role
+
+Use:
+
+JenkinsTerraformRole
+
+Click:
+
+Create role
+
+The IAM role is now created.
+
+🔟 Attach IAM Role to Jenkins EC2
+
+Go to:
+
+AWS Console
+    ↓
+EC2
+    ↓
+Instances
+
+Select the EC2 instance where Jenkins is installed.
+
+Then:
+
+Actions
+    ↓
+Security
+    ↓
+Modify IAM role
+
+Select:
+
+JenkinsTerraformRole
+
+Click:
+
+Update IAM role
+
+The IAM role is now attached to the Jenkins EC2 instance.
+
+1️⃣1️⃣ Test AWS Access
+
+Return to the Jenkins EC2 server.
+
+Run:
+
+aws sts get-caller-identity
+
+You should receive output similar to:
+
+{
+    "UserId": "...",
+    "Account": "123456789012",
+    "Arn": "arn:aws:iam::123456789012:role/JenkinsTerraformRole"
+}
+
+Now test specifically as the Jenkins user:
+
+sudo -u jenkins aws sts get-caller-identity
+
+If this command works, Jenkins has AWS access.
+
+1️⃣2️⃣ Create the Terraform Project
+
+Create a project directory:
+
+mkdir ~/terraform-jenkins
+cd ~/terraform-jenkins
+
+The project structure will be:
+
+terraform-jenkins/
+│
+├── provider.tf
+├── main.tf
+└── Jenkinsfile
+1️⃣3️⃣ Create provider.tf
+
+Create the file:
+
+nano provider.tf
+
+Add:
+
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source = "hashicorp/aws"
     }
   }
 }
@@ -127,61 +321,164 @@ terraform {
 provider "aws" {
   region = "ap-south-1"
 }
-Step 5: Define Infrastructure Resources 📦
-Create the main configuration file (main.tf):
 
-Bash
+Save:
+
+Ctrl + O
+Enter
+Ctrl + X
+1️⃣4️⃣ Create main.tf
+
+Create:
+
 nano main.tf
-Define an S3 bucket resource (ensure the bucket name is globally unique):
+
+Add:
+
+resource "aws_s3_bucket" "demo" {
+  bucket = "sourabh-terraform-jenkins-demo-123456789"
+}
+
+⚠️ S3 bucket names must be globally unique.
+
+If this name already exists, change it.
+
+Example:
+
+resource "aws_s3_bucket" "demo" {
+  bucket = "my-terraform-jenkins-demo-987654321"
+}
+1️⃣5️⃣ Test Terraform Manually
+
+Go to the Terraform directory:
+
+cd ~/terraform-jenkins
+
+Initialize Terraform:
+
+terraform init
+
+Validate the configuration:
+
+terraform validate
+
+Create a plan:
+
+terraform plan
+
+Expected result:
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+
+At this point:
 
 Terraform
-resource "aws_s3_bucket" "demo" {
-  bucket = "sourabh-terraform-demo-123456789"
+    │
+    ├── Configuration ✅
+    ├── AWS Provider   ✅
+    └── AWS Access     ✅
+1️⃣6️⃣ Optional: Test Terraform Apply Manually
 
-  tags = {
-    Name        = "Terraform Demo Bucket"
-    Environment = "Dev"
-    ManagedBy   = "Jenkins"
-  }
-}
-Step 6: Test Terraform Manually 🛠️
-Before automating through Jenkins, manually verify the Terraform workflow:
+You can test the Terraform deployment before using Jenkins.
 
-Initialize the directory to download provider plugins:
+Run:
 
-Bash
-terraform init
-Validate syntax and configuration integrity:
+terraform apply
 
-Bash
-terraform validate
-Preview the changes:
+Terraform will ask:
 
-Bash
-terraform plan
-Verify output displays: Plan: 1 to add, 0 to change, 0 to destroy.
+Do you want to perform these actions?
 
-Apply the configuration to create the resource:
+Type:
 
-Bash
-terraform apply -auto-approve
-Step 7: Create a GitHub Repository 🐙
-Go to GitHub and create a new repository named terraform-jenkins.
+yes
 
-Keep the repository public or private, and leave it empty (without initializing README or .gitignore).
+Terraform will create the S3 bucket.
 
-Step 8: Create the Declarative Jenkinsfile 📄
-In your project directory (~/terraform-jenkins), create the pipeline script:
+Verify it in:
 
-Bash
+AWS Console
+    ↓
+S3
+    ↓
+Buckets
+
+After testing, you can destroy the resource:
+
+terraform destroy
+
+Type:
+
+yes
+
+This removes the test infrastructure.
+
+1️⃣7️⃣ Create GitHub Repository 🐙
+
+Go to GitHub and create a new repository:
+
+terraform-jenkins
+
+You can keep it private or public.
+
+The repository will contain:
+
+terraform-jenkins/
+│
+├── provider.tf
+├── main.tf
+└── Jenkinsfile
+1️⃣8️⃣ Configure Git
+
+Go to the Terraform project:
+
+cd ~/terraform-jenkins
+
+Initialize Git:
+
+git init
+
+Add your GitHub repository:
+
+git remote add origin https://github.com/YOUR_USERNAME/terraform-jenkins.git
+
+Verify:
+
+git remote -v
+1️⃣9️⃣ Push Terraform Files to GitHub
+
+Add the files:
+
+git add .
+
+Commit:
+
+git commit -m "Add Terraform configuration"
+
+Set the main branch:
+
+git branch -M main
+
+Push:
+
+git push -u origin main
+
+Your Terraform files are now available on GitHub.
+
+2️⃣0️⃣ Create the Jenkinsfile 🔧
+
+Create the Jenkinsfile:
+
 nano Jenkinsfile
-Paste the following Declarative Pipeline script:
 
-Groovy
+Add:
+
 pipeline {
+
     agent any
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -214,78 +511,430 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
+        success {
+            echo 'Terraform deployment completed successfully!'
+        }
+
+        failure {
+            echo 'Terraform deployment failed!'
         }
     }
 }
-Step 9: Version Control & Push to GitHub 📤
-Ensure Git is installed:
+2️⃣1️⃣ Push Jenkinsfile to GitHub
 
-Bash
-sudo apt update && sudo apt install -y git
-Initialize Git and commit code:
+Add the Jenkinsfile:
 
-Bash
-cd ~/terraform-jenkins
-git init
-git branch -M main
-git add .
-git commit -m "feat: initial terraform pipeline configuration"
-Link the remote repository and push code:
+git add Jenkinsfile
 
-Bash
-git remote add origin [https://github.com/YOUR_USERNAME/terraform-jenkins.git](https://github.com/YOUR_USERNAME/terraform-jenkins.git)
-git push -u origin main
-(Use a Personal Access Token [PAT] if prompted for GitHub authentication).
+Commit:
 
-Step 10: Create a Pipeline Job in Jenkins ⚙️
-Open your Jenkins Dashboard in the web browser.
+git commit -m "Add Jenkins Terraform pipeline"
 
-Click New Item.
+Push:
 
-Enter Item Name: terraform-jenkins.
+git push origin main
 
-Select Pipeline.
+Your GitHub repository should now look like:
 
-Click OK.
+terraform-jenkins/
+│
+├── Jenkinsfile
+├── main.tf
+└── provider.tf
+2️⃣2️⃣ Create Jenkins Pipeline
 
-Step 11: Configure Pipeline SCM Settings ⚙️
-Scroll down to the Pipeline section.
+Open Jenkins:
 
-Select Definition: Pipeline script from SCM.
+http://<JENKINS-IP>:8080
 
-Select SCM: Git.
+Go to:
 
-Enter Repository URL: https://github.com/YOUR_USERNAME/terraform-jenkins.git.
+Jenkins
+    ↓
+New Item
 
-Set Branch Specifier: */main.
+Enter:
 
-Set Script Path: Jenkinsfile.
+terraform-jenkins
 
-Click Save.
+Select:
 
-Step 12: Trigger the Pipeline Run 🚀
-Click Build Now on the left menu of your Jenkins project page.
+Pipeline
 
-Monitor the stage view as Jenkins runs:
+Click:
 
-Checkout ➔ Terraform Init ➔ Terraform Validate ➔ Terraform Plan ➔ Terraform Apply.
+OK
+2️⃣3️⃣ Configure GitHub Repository in Jenkins
 
-Check the Console Output to confirm execution details:
+Scroll down to the:
 
-Plaintext
+Pipeline
+
+section.
+
+For:
+
+Definition
+
+select:
+
+Pipeline script from SCM
+
+For:
+
+SCM
+
+select:
+
+Git
+
+Repository URL:
+
+https://github.com/YOUR_USERNAME/terraform-jenkins.git
+
+Branch:
+
+*/main
+
+Script Path:
+
+Jenkinsfile
+
+The configuration should look like:
+
+Definition:
+Pipeline script from SCM
+
+SCM:
+Git
+
+Repository URL:
+https://github.com/YOUR_USERNAME/terraform-jenkins.git
+
+Branch:
+*/main
+
+Script Path:
+Jenkinsfile
+
+Click:
+
+Save
+2️⃣4️⃣ Run the Jenkins Pipeline ▶️
+
+Open:
+
+Jenkins
+    ↓
+terraform-jenkins
+
+Click:
+
+Build Now
+
+Jenkins will automatically execute:
+
+Checkout
+    ↓
+Terraform Init
+    ↓
+Terraform Validate
+    ↓
+Terraform Plan
+    ↓
+Terraform Apply
+    ↓
+AWS
+2️⃣5️⃣ Check Jenkins Console Output
+
+Open:
+
+Build #1
+    ↓
+Console Output
+
+You should see:
+
+[Pipeline] stage
+[Pipeline] { (Checkout)
+
+[Pipeline] stage
+[Pipeline] { (Terraform Init)
+
+[Pipeline] stage
+[Pipeline] { (Terraform Validate)
+
+[Pipeline] stage
+[Pipeline] { (Terraform Plan)
+
+[Pipeline] stage
+[Pipeline] { (Terraform Apply)
+
+At the end:
+
 Finished: SUCCESS
-Step 13: Verify Provisioned Resources in AWS Console 🔎
-Open the AWS Management Console.
 
-Navigate to S3 ➔ Buckets.
+🎉 Your Jenkins + Terraform deployment is working.
 
-Verify that your bucket (sourabh-terraform-demo-123456789) is listed and active.
+2️⃣6️⃣ Verify AWS Resource ☁️
 
-🧹 Cleanup / Teardown (Optional) 🗑️
-To avoid unexpected charges on AWS, destroy the created infrastructure when finished:
+Go to:
 
-Bash
+AWS Console
+    ↓
+S3
+    ↓
+Buckets
+
+You should see the S3 bucket created by Terraform.
+
+This confirms:
+
+🐙 GitHub
+     ↓
+🔧 Jenkins
+     ↓
+🏗️ Terraform
+     ↓
+☁️ AWS
+2️⃣7️⃣ Complete Project Structure
+
+Your GitHub repository should contain:
+
+terraform-jenkins/
+│
+├── Jenkinsfile
+├── main.tf
+└── provider.tf
+provider.tf
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+main.tf
+resource "aws_s3_bucket" "demo" {
+  bucket = "YOUR-UNIQUE-BUCKET-NAME"
+}
+Jenkinsfile
+pipeline {
+
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform deployment completed successfully!'
+        }
+
+        failure {
+            echo 'Terraform deployment failed!'
+        }
+    }
+}
+2️⃣8️⃣ Destroy Test Infrastructure 🧹
+
+When you finish testing, destroy the Terraform resource:
+
 cd ~/terraform-jenkins
-terraform destroy -auto-approve
+terraform destroy
+
+Confirm:
+
+yes
+
+⚠️ Never run terraform destroy against production infrastructure unless you intentionally want to delete it.
+
+🔐 Important Security Notes
+❌ Do not put AWS Access Keys in Jenkinsfile
+
+Never do this:
+
+environment {
+    AWS_ACCESS_KEY_ID = 'xxxxxxxx'
+    AWS_SECRET_ACCESS_KEY = 'xxxxxxxx'
+}
+
+Use an EC2 IAM Role instead.
+
+❌ Do not commit secrets to GitHub
+
+Never commit:
+
+AWS Access Keys
+AWS Secret Keys
+Passwords
+Private Keys
+API Tokens
+Terraform secret variables
+⚠️ AdministratorAccess
+
+AdministratorAccess is acceptable for a temporary learning environment, but it should be replaced with a least-privilege IAM policy before using this setup in production.
+
+📋 Final Checklist
+ Jenkins installed
+ Jenkins service running
+ Terraform installed
+ Terraform available to Jenkins user
+ Git installed
+ AWS CLI installed
+ IAM Role created
+ IAM Role attached to Jenkins EC2
+ AWS access tested
+ Jenkins AWS access tested
+ Terraform project created
+ provider.tf created
+ main.tf created
+ Terraform initialized
+ Terraform validated
+ Terraform plan successful
+ GitHub repository created
+ Terraform files pushed to GitHub
+ Jenkinsfile created
+ Jenkinsfile pushed to GitHub
+ Jenkins Pipeline created
+ GitHub repository configured in Jenkins
+ Jenkins Build Now executed
+ Terraform Apply successful
+ AWS resource verified
+🔄 Final CI/CD Architecture
+                         ☁️ AWS
+                           │
+                           │
+                    🔐 IAM Role
+                           │
+                           ▼
+🐙 GitHub ───────────► 🔧 Jenkins
+                           │
+                           │
+                           ▼
+                     🏗️ Terraform
+                           │
+                           │
+                           ▼
+                    ☁️ AWS Resources
+🚀 Next Improvements
+
+Once this basic pipeline is working successfully, improve it step by step.
+
+Phase 1 — Automation
+GitHub
+   ↓
+Webhook
+   ↓
+Jenkins
+   ↓
+Terraform
+
+A Git push will automatically trigger Jenkins.
+
+Phase 2 — Terraform State
+
+Use:
+
+Amazon S3
+
+for remote Terraform state.
+
+Phase 3 — Approval
+
+Add:
+
+Terraform Plan
+      ↓
+Manual Approval
+      ↓
+Terraform Apply
+Phase 4 — Environments
+
+Create:
+
+Development
+     ↓
+Staging
+     ↓
+Production
+Phase 5 — Security
+
+Add:
+
+Terraform Security Scan
+        ↓
+Secret Scanning
+        ↓
+Least-Privilege IAM
+Phase 6 — Monitoring and Notifications
+
+Add:
+
+Jenkins
+   ↓
+Monitoring
+   ↓
+Notifications
+🎯 Final Goal
+
+The production-style pipeline can eventually become:
+
+👨‍💻 Developer
+      │
+      │ git push
+      ▼
+🐙 GitHub
+      │
+      │ Webhook
+      ▼
+🔧 Jenkins
+      │
+      ├── 📥 Checkout
+      │
+      ├── 🔍 Validate
+      │
+      ├── 🏗️ Terraform Init
+      │
+      ├── 📋 Terraform Plan
+      │
+      ├── ✋ Manual Approval
+      │
+      └── 🚀 Terraform Apply
+                │
+                ▼
+             ☁️ AWS

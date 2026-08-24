@@ -1,35 +1,37 @@
 pipeline {
+
     agent any
 
     stages {
 
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Sourabhf4/student-app-k8s.git'
+                checkout scm
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Terraform Init') {
             steps {
-                dir('frontend') {
-                    sh 'docker build -t frontendd:latest .'
-                }
+                sh 'terraform init'
             }
         }
 
-        stage('Run Container') {
+        stage('Terraform Validate') {
             steps {
-                sh '''
-                    docker run -d --name frontendhkdbfcnwihgefvjud -P frontendd:latest
-                '''
+                sh 'terraform validate'
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan'
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
             }
         }
     }
 }
-
-
-
-
-
-

@@ -5,3 +5,6 @@ resource "aws_s3_bucket" "demo" {
 resource "aws_s3_bucket" "demo1" {
   bucket = "my-terraform-jenkins-demo-9696969696"
 }
+resource "aws_s3_bucket" "demo2" {
+  bucket = "my-terraform-jenkins-demo-868686"
+}
